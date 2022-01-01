@@ -8,44 +8,17 @@
     <script src="main.js" defer></script>
     <link rel="stylesheet" href="main.css" />
     <link rel="icon" href="./icon/icon.png" />
-
   </head>
   <body>
-    <header>
-      <button id="mainMenu">Main Menu</button>
-    </header>
-    <div class="startScreen">
-      <div class="mainTitle">Tic Tac Toe</div>
-      <div class="modeSelection">
-        <div class="ai">
-          <button id="aiMode">Play against "AI"</button>
-        </div>
-        <div class="player">
-          <button id="pvpMode">Player vs Player</button>
-        </div>
-      </div>
-    </div>
-    <div class="nameSelection">
-      <form class="chooseName" id="chooseName1">
-          <label for="player1Name">✕ name:</label>
-          <input type="text" id="player1Name">
-          <button type ="submit" id="submitName1">Submit</button>
-      </form>
-      <form class="chooseName" id="chooseName2">
-          <label for="player2Name">⭘ name:</label>
-          <input type="text" id="player2Name">
-          <button type ="submit" id="submitName2">Submit</button>
-      </form>
-
-    </div>
     <main>
-      <div class="resultScreen">
-      </div>
+      <header>
+        <button id="mainMenu">Main Menu</button>
+      </header>
       <div class="container">
-        <div class="leftActive" id ="left">
+        <div class="leftActive" id="left">
           <div class="xScore">score: 0</div>
           <div id="player1"></div>
-          <div id="xTurn">✕</div> 
+          <div id="xTurn">✕</div>
         </div>
         <div class="board">
           <div class="cell" id="0"></div>
@@ -57,15 +30,45 @@
           <div class="cell" id="6"></div>
           <div class="cell" id="7"></div>
           <div class="cell" id="8"></div>
-        </div> 
-        <div class="right" id ="right">
-              <div class="oScore">score: 0</div>
-              <div id="player2"></div>
-              <div id="oTurn">⭘</div> 
-            </div>
+        </div>
+        <div class="right" id="right">
+          <div class="oScore">score: 0</div>
+          <div id="player2"></div>
+          <div id="oTurn">⭘</div>
         </div>
       </div>
-      <footer></footer>
+      <div class="startScreen">
+        <div class="mainTitle">Tic Tac Toe</div>
+        <div class="modeSelection">
+          <div class="ai">
+            <button id="aiMode">Play against "AI"</button>
+          </div>
+          <div class="player">
+            <button id="pvpMode">Player vs Player</button>
+          </div>
+        </div>
+      </div>
+      <div class="nameSelection">
+        <form class="chooseName" id="chooseName1">
+          <label for="player1Name">✕ name:</label>
+          <input type="text" id="player1Name" />
+          <button type="submit" id="submitName1">Submit</button>
+        </form>
+        <form class="chooseName" id="chooseName2">
+          <label for="player2Name">⭘ name:</label>
+          <input type="text" id="player2Name" />
+          <button type="submit" id="submitName2">Submit</button>
+        </form>
+      </div>
+      <div class="resultScreen"></div>
+      </div>
+
+
+      <footer>
+        <a href="https://github.com/MorePog" id="githubLink"
+          >MorePog <img src="./icon/github logo.png" alt="logo" id="githubLogo"
+        /></a>
+      </footer>
     </main>
   </body>
 </html>
