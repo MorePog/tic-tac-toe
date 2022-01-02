@@ -300,7 +300,7 @@ button:active {
   transition: 0.3s;
 }
 .cell:hover {
-background: #00000005;
+background: #00000008;
   color: #ff6a6a;
 }
 .cell:active {
