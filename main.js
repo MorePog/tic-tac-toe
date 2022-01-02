@@ -3,11 +3,19 @@ let Start = (() => {
   let bigBadBot = false;
   let name1 = false;
   let name2 = false;
+  let mode = "hard";
+  let botName = "🤖 BigBadBot"
 
   function returnBigBadBot() {
     return bigBadBot;
   }
+  function returnMode() {
+    return mode;
+  }
+
   const startScreen = document.querySelector(".startScreen");
+
+  // event listener for mode selection buttons
   modeSelection();
   function modeSelection() {
     const aiBtn = document.getElementById("aiMode");
@@ -22,47 +30,72 @@ let Start = (() => {
   }
 
   function pvpMode() {
-    startScreen.style.transform = "scale(30)"
-    startScreen.style.opacity = "0"
-    setTimeout(() => {
-      startScreen.style.zIndex = "-2";
-      nameSelection();
-    }, 200);
+    startScreen.style.opacity = "0";
+    startScreen.style.zIndex = "-2";
+    nameSelection();
   }
   function aiMode() {
     bigBadBot = true;
+    difficulty();
     nameSelection();
-    startScreen.style.transform = "scale(30)"
-    startScreen.style.opacity = "0"
-    setTimeout(() => {
-      startScreen.style.zIndex = "-2";
-    }, 200);
+    startScreen.style.opacity = "0";
+    startScreen.style.zIndex = "-2";
   }
-  
+
+  function difficulty() {
+    const nameSelection = document.querySelector(".nameSelection");
+    const difficultyBtn = document.createElement("button");
+    difficultyBtn.classList.add("hard");
+    difficultyBtn.setAttribute("id", "difficulty");
+    difficultyBtn.textContent = "Current mode: HARD";
+    nameSelection.prepend(difficultyBtn);
+    nameSelection.style.gap = "15px"
+
+    difficultyBtn.addEventListener("click", () => {
+      if (mode === "hard") {
+        mode = "easy";
+        botName = "👶 BabyBot"
+        difficultyBtn.className = "easy";
+        difficultyBtn.textContent = "Current mode: baby";
+      } else {
+        mode = "hard";
+        botName = "🤖 BigBadBot"
+        difficultyBtn.className = "hard";
+        difficultyBtn.textContent = "Current mode: HARD";
+      }
+      console.log({botName});
+    });
+  }
   function nameSelection() {
     const nameSelection = document.querySelector(".nameSelection");
     const nameForm1 = document.getElementById("chooseName1");
     const nameForm2 = document.getElementById("chooseName2");
     function zIndex() {
-      nameSelection.style.transform = "scale(10)"
-      nameSelection.style.opacity = "0"
+      // nameSelection.style.transform = "scale(10)";
+      nameSelection.style.opacity = "0";
       nameSelection.style.zIndex = "-3";
+      if (bigBadBot === true)
+        nameSelection.removeChild(document.getElementById("difficulty"));
     }
-    
+
     nameSelection.style.zIndex = "3";
-    
+
     nameForm1.addEventListener("submit", (e) => {
       e.preventDefault();
       Players.add(1, nameForm1.player1Name.value);
       nameForm1.reset();
       name1 = true;
+      if (bigBadBot === true) {
+        nameSelection.prepend(nameForm2)
+        if (mode === "hard") Players.add(2, botName);
+        if (mode === "easy") Players.add(2, botName);
+      }
       if (name1 === true && name2 === true) zIndex();
-      if (name1 === true && bigBadBot === true) zIndex()
-    });
+      if (name1 === true && bigBadBot === true) zIndex();
 
-    if (bigBadBot === true) {
-      Players.add(2, "BigBadBot");
-    }
+    });
+    if (bigBadBot === true) nameSelection.removeChild(nameForm2)
+
     if (bigBadBot !== true) {
       nameForm2.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -76,101 +109,74 @@ let Start = (() => {
   document.getElementById("mainMenu").addEventListener("click", () => {
     location.reload();
   });
-  return { returnBigBadBot };
+  return { returnBigBadBot, returnMode };
 })();
 
 let Gameboard = (() => {
   const cells = document.querySelectorAll(".cell");
   let gameboard = [];
   let playerTurn = "X";
-  let win = false;
-  let tie = false;
+  let roundTurn = "X";
   let xScore = 0;
   let oScore = 0;
-  let block =false
+  let block = false;
 
   for (let i = 0; i < 9; i++) gameboard.push(""); //builds board array
 
-  function returnGameboard() {
-    return gameboard;
+  // eventlistener for each cell of the board
+  _selectTile();
+  function _selectTile() {
+    cells.forEach((cell) => {
+      cell.addEventListener("click", () => {
+        if (block === true) return;
+        if (playerTurn === "X") {
+          _add(cell.id);
+          return;
+        }
+
+        if (playerTurn === "O") {
+          _add(cell.id);
+          return;
+        }
+      });
+    });
+  }
+  // adds X or O to cell
+  function _add(cell) {
+    if (gameboard[cell] !== "") return;
+    if (playerTurn === "X") gameboard.splice(cell, 1, "X");
+    if (playerTurn === "O") gameboard.splice(cell, 1, "O");
+    _render(cell);
   }
 
   // displays array on the board
   function _render(cellId) {
-
     let cell = document.getElementById(cellId);
+
     if (playerTurn === "O") cell.textContent = "⭘";
     if (playerTurn === "X") cell.textContent = "✕";
-    _checkWin();
-    if (win === true) return;
+
+    let win = _checkWin();
+    if (win !== null) return _announceResult(win);
+
     _nextTurn();
-    block = true
-    setTimeout(() => {
-      if (
-        Start.returnBigBadBot() === true &&
-        playerTurn === "O" &&
-        win === false
-        ) {
-          let randomCell = aiPlay();
-          gameboard.splice(randomCell, 1, "O");
-          _render(randomCell);
-        }
-        block = false
-      }, 500);
-  }
-
-  function _announceResult(result) {
-    const container = document.querySelector(".resultScreen");
-    const div = document.createElement("div");
-    container.prepend(div);
-    div.classList.add("result");
-    if (result === "X") {
-      div.textContent = `${Players.players[0]} wins the game!`;
-      document.querySelector(".xScore").textContent = `score: ${xScore}`;
+    if (Start.returnBigBadBot() === true && playerTurn === "O") {
+      block = true;
+      let aiCell;
+      let mode = Start.returnMode();
+      if (mode === "hard") aiCell = bestMove();
+      if (mode === "easy") aiCell = aiPlay();
+      gameboard.splice(aiCell, 1, "O");
+      setTimeout(() => {
+        _render(aiCell);
+        block = false;
+      }, 1000);
     }
-    if (result === "O") {
-      div.textContent = `${Players.players[1]} wins the game!`;
-      document.querySelector(".oScore").textContent = `score: ${oScore}`;
-    }
-    if (result === tie) div.textContent = `It's a tie...`;
-    container.style.zIndex = "1";
-
-    restart();
-  }
-
-  function restart() {
-    const container = document.querySelector(".resultScreen");
-    const btn = document.createElement("button");
-    container.appendChild(btn);
-    btn.classList.add("restart");
-    btn.textContent = "Replay";
-    btn.addEventListener("click", () => reload());
-  }
-
-  function reload() {
-    gameboard = [];
-    for (let i = 0; i < 9; i++) {
-      let cell = document.getElementById(i);
-      cell.textContent = "";
-      gameboard.push("");
-    }
-
-    win = false;
-    tie = false;
-
-    let resultScreen = document.querySelector(".resultScreen");
-    resultScreen.style.zIndex = "-1";
-    let result = document.querySelector(".result");
-    let btn = document.querySelector(".restart");
-    resultScreen.removeChild(result);
-    resultScreen.removeChild(btn);
-    if (Start.returnBigBadBot() === false) _nextTurn();
-    if (Start.returnBigBadBot() === true) playerTurn = "X";
-    _selectTile();
   }
 
   // checks if board array matches winning arrays
   function _checkWin() {
+    let result = null;
     const winningArray = [
       [0, 1, 2],
       [3, 4, 5],
@@ -187,32 +193,43 @@ let Gameboard = (() => {
         gameboard[i[1]] === "X" &&
         gameboard[i[2]] === "X"
       ) {
-        win = true;
-        xScore += 1;
-        return _announceResult("X");
+        return (result = "X");
       }
       if (
         gameboard[i[0]] === "O" &&
         gameboard[i[1]] === "O" &&
         gameboard[i[2]] === "O"
       ) {
-        win = true;
-        oScore += 1;
-        console.log({ oScore });
-        return _announceResult("O");
+        return (result = "O");
       }
     });
-
     let tieCount = 0;
     gameboard.forEach((e) => {
       if (e === "") tieCount++;
     });
-    if (tieCount === 0 && win !== true) {
-      win = true;
-      return _announceResult(tie);
-    }
+    if (tieCount === 0 && result === null) return (result = "tie");
+    return result;
   }
-
+  // displays result when there's a win or a tie
+  function _announceResult(result) {
+    const container = document.querySelector(".resultScreen");
+    const div = document.createElement("div");
+    div.classList.add("result");
+    if (result === "X") {
+      xScore++;
+      div.textContent = `${Players.players[0]} wins the game!`;
+      document.querySelector(".xScore").textContent = `score: ${xScore}`;
+    }
+    if (result === "O") {
+      oScore++;
+      div.textContent = `${Players.players[1]} wins the game!`;
+      document.querySelector(".oScore").textContent = `score: ${oScore}`;
+    }
+    if (result === "tie") div.textContent = `It's a tie...`;
+    container.prepend(div);
+    container.style.zIndex = "1";
+    restart();
+  }
   // changes turn from X to O and vice versa
   function _nextTurn() {
     const right = document.getElementById("right");
@@ -229,6 +246,43 @@ let Gameboard = (() => {
     }
   }
 
+  // adds restart button
+  function restart() {
+    const container = document.querySelector(".resultScreen");
+    const btn = document.createElement("button");
+    container.appendChild(btn);
+    btn.classList.add("restart");
+    btn.textContent = "Replay";
+    btn.addEventListener("click", () => reload());
+  }
+  // resets board and adjusts player turns
+  function reload() {
+    gameboard = [];
+    for (let i = 0; i < 9; i++) {
+      let cell = document.getElementById(i);
+      cell.textContent = "";
+      gameboard.push("");
+    }
+
+    let resultScreen = document.querySelector(".resultScreen");
+    resultScreen.style.zIndex = "-1";
+    let result = document.querySelector(".result");
+    let btn = document.querySelector(".restart");
+    resultScreen.removeChild(result);
+    resultScreen.removeChild(btn);
+    if (roundTurn === "X") {
+      playerTurn = "X";
+      roundTurn = "O";
+    } else {
+      playerTurn = "O";
+      roundTurn = "X";
+    }
+    _nextTurn();
+    if (Start.returnBigBadBot() === true && playerTurn === "O") _add(aiPlay());
+    _selectTile();
+  }
+
+  // random num generator for "dumb" ai
   function aiPlay() {
     let randomNum = Math.floor(Math.random() * 9);
     if (gameboard[randomNum] !== "") {
@@ -237,34 +291,69 @@ let Gameboard = (() => {
     return randomNum;
   }
 
-  // adds X or O to cell
-  function _add(cell) {
-    if (gameboard[cell] !== "") return;
-    if (playerTurn === "X") gameboard.splice(cell, 1, "X");
-    if (playerTurn === "O") gameboard.splice(cell, 1, "O");
-    _render(cell);
+  // calls minimax algorithm
+  function bestMove() {
+    let move;
+    let bestScore = Infinity;
+    for (let i = 0; i <= gameboard.length; i++) {
+      if (gameboard[i] === "") {
+        gameboard[i] = "O";
+        let score = miniMax(gameboard, 0, true);
+        gameboard[i] = "";
+        if (score < bestScore) {
+          bestScore = score;
+          move = i;
+        }
+      }
+    }
+    return move;
+  }
+  let scores = {
+    X: 10,
+    O: -10,
+    tie: 0,
+  };
+  // minimax algorithm (find the most optimal move with recursive function)
+  function miniMax(board, depth, isMaximizing) {
+    let result = _checkWin();
+    if (result !== null) return scores[result];
+
+    if (isMaximizing === true) {
+      let bestScore = -Infinity;
+      for (let i = 0; i <= board.length; i++) {
+        if (board[i] === "") {
+          board[i] = "X";
+          let score = miniMax(board, depth + 1, false);
+          board[i] = "";
+          bestScore = Math.max(score, bestScore);
+        }
+      }
+      return bestScore;
+    }
+    if (isMaximizing === false) {
+      let bestScore = Infinity;
+      for (let i = 0; i <= board.length; i++) {
+        if (board[i] === "") {
+          board[i] = "O";
+          let score = miniMax(board, depth + 1, true);
+          board[i] = "";
+          bestScore = Math.min(score, bestScore);
+        }
+      }
+      return bestScore;
+    }
   }
 
-  // eventlistener for each cell of the board
-  _selectTile();
-  function _selectTile() {
-    cells.forEach((cell) => {
-      cell.addEventListener("click", () => {
-        if (block === true) return;
-        if (playerTurn === "X" && win !== true && tie !== true) {
-          _add(cell.id);
-          return;
-        }
-
-        if (playerTurn === "O" && win !== true && tie !== true) {
-          _add(cell.id);
-          return;
-        }
-      });
-    });
+  function returnGameboard() {
+    return gameboard;
   }
 
-  return { oScore, xScore, returnGameboard, restart };
+  return {
+    oScore,
+    xScore,
+    returnGameboard,
+    restart,
+  };
 })();
 
 const Players = (() => {
@@ -295,10 +384,5 @@ const Players = (() => {
     }
   };
 
-  function restart() {
-    players = ["", ""];
-    p1HasName = false;
-    p2HasName = false;
-  }
-  return { players, add, restart };
+  return { players, add };
 })();

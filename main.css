@@ -4,7 +4,7 @@ html {
     height: 100%;
 }
 body {
-    background: #e2e2e2;
+    background: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -21,7 +21,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #3d07071c;
+    background: #3838381c;
     box-shadow: #3d2b2ba8 0px 0px 15px;
     z-index: 4;
     flex-shrink: 0;
@@ -29,7 +29,8 @@ header {
     top: 0;
 }
 main {
-  background: #ffffff;
+    background: rgb(255, 255, 255);
+
   width: 100%;
   height: 100%;
   display: flex;
@@ -75,7 +76,7 @@ footer {
 
 .startScreen,
 .nameSelection {
-  background: #e2e2e2;
+  background: #ffffff;
   height: 100%;
   width: 100%;
   z-index: 3;
@@ -84,11 +85,22 @@ footer {
   justify-content: center;
   gap: 50px;
   align-items: center;
-  transition: 1s;
   position: fixed;
 }
 .nameSelection {
+    transition: 1s;
   z-index: 2;
+}
+#submitName1, #submitName2 {
+    box-shadow: none;
+}
+#submitName1:hover, #submitName2:hover {
+    box-shadow: none;
+    background: #ff6a6a;
+    top: 0;
+}
+#submitName1:active, #submitName2:active {
+    background: #ff9a9a;
 }
 .mainTitle {
   font-size: 50px;
@@ -100,11 +112,11 @@ footer {
   gap: 10px;
 }
 .chooseName {
-  height: 80px;
-  width: 150px;
-  background: #ffffff52;
+  height: 60px;
+  width: 100px;
+  background: #dadada52;
   box-shadow: #ffffff52 0px 0px 10px;
-  border-radius: 30px;
+  border-radius: 5px;
   padding: 30px;
   display: flex;
   flex-direction: column;
@@ -114,17 +126,18 @@ footer {
   transition: 0.5s;
 }
 .chooseName:hover {
-  background: #ff6a6a71;
+  background: #ff6a6a3d;
 }
 #player1Name,
 #player2Name {
   border: none;
   border-radius: 5px;
   width: 125px;
-  font-weight: 100;
+  font-weight: 300;
   background: #ffffffce;
+  color: black;
+  text-decoration: none;
 }
-
 .oScore,
 .xScore {
   margin-bottom: 30px;
@@ -136,41 +149,61 @@ footer {
 }
 
 button {
-  border: solid #ff6a6a 1px;
-  background-color: white;
+  border: solid #fcfcfc 1px;
+  background-color: #474747;
+  color: white;
   border-radius: 5px;
   height: 30px;
   width: 130px;
-  box-shadow: #00000075 5px 2px 10px;
+  box-shadow: #00000075 0px 5px 10px;
   top: 0;
   bottom: 0;
   position: relative;
   transition: ease-in-out 0.1s;
+  cursor: pointer;
 }
 button:hover {
   top: -3px;
-  box-shadow: #00000075 5px 5px 10px;
+  box-shadow: #00000075 0px 8px 10px;
 }
 button:active {
   top: 3px;
-  box-shadow: #00000075 0px 0px 4px;
+  box-shadow: #00000075 0px 1px 4px;
 }
 
 #mainMenu {
   /* display: flex; */
   border: none;
-  background: #b16464;
-  color: #ffe3e3;
-  box-shadow: rgba(83, 1, 1, 0.349) inset 2px 2px 5px;
+  color: #ffffff;
+  box-shadow: none;
+  height: 20px;
+  width: 90px;
+  border-radius: 0.2em;
 }
-#mainMenu:hover {
+#mainMenu:hover{
   top: 0;
-  background: #b36c6c;
+  background: #ff6a6a;
+  color: white;
 }
 #mainMenu:active {
   padding-top: 5px;
   top: 0;
   box-shadow: inset #4b0606c4 2px 2px 10px;
+}
+
+.hard{
+    width: 150px;
+    height: 40px;
+    background: #ff6a6a;
+    color: white;
+    
+}
+.easy{
+    width: 150px;
+    height: 40px;
+    background: #b2f3b2;
+    color: black;
+
 }
 .scoreBoard {
   display: flex;
@@ -192,16 +225,27 @@ button:active {
   display: flex;
   width: 300px;
   height: 300px;
-  aspect-ratio: 1;
- flex: 0 0 300px;
   flex-wrap: wrap;
+  aspect-ratio: 1;
+  box-shadow: #79797923 0px 0px 30px;
+  border-radius: 10px;
 
   /* gap: 5px */
 }
+
+@keyframes shake {
+    0% {transform: rotate(10deg);}
+    25% {transform: rotate(-10deg);}
+    50% {transform: rotate(20deg);}
+    75% {transform: rotate(-5deg);}
+    100% {transform: rotate(0deg);}
+}
+
 .left,
 .right,
 .leftActive,
 .rightActive {
+    overflow: hidden;
   flex-grow: 0;
   flex-shrink: 1;
   font-size: 20px;
@@ -220,12 +264,16 @@ button:active {
 .rightActive {
   box-shadow: #b2f3b2 0 0 10px;
   background-color: #b2f3b2;
+  animation: shake 0.5s;
 }
 @media only screen and (max-width: 700px) {
   .container {
     flex-wrap: wrap;
     width: 50%;
   }
+  .board {
+    margin: 0;
+}
 }
 @media only screen and (max-height: 700px) {
   .left,
@@ -263,7 +311,7 @@ button:active {
   color: #b91f1f;
 }
 .resultScreen {
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
   width: 100%;
   height: 100%;
   position: fixed;
